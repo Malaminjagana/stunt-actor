@@ -14,7 +14,8 @@
     var introScreen = document.getElementById('intro-video-screen');
     var introVideo = document.getElementById('introVideo');
     var playPauseBtn = introScreen ? introScreen.querySelector('.intro-playpause-btn') : null;
-    var unmuteBtn = introScreen ? introScreen.querySelector('.intro-unmute-btn') : null;
+    var soundBtn = introScreen ? introScreen.querySelector('.intro-sound-btn') : null;
+    var soundOverlay = document.getElementById('intro-sound-overlay');
     var closeBtn = introScreen ? introScreen.querySelector('.intro-close-btn') : null;
     var skipBtn = introScreen ? introScreen.querySelector('.intro-skip-btn') : null;
     var tapPlayBtn = introScreen ? introScreen.querySelector('.intro-play-btn') : null;
@@ -64,16 +65,34 @@
         playPauseBtn.textContent = introVideo.paused ? 'Play' : 'Pause';
     }
 
+    function showSoundOverlay() {
+        if (!soundOverlay) return;
+        soundOverlay.classList.add('visible');
+    }
+
+    function hideSoundOverlay() {
+        if (!soundOverlay) return;
+        soundOverlay.classList.remove('visible');
+    }
+
     function startVideoAutoplay() {
         if (!introVideo) return;
-        introVideo.muted = true;
+        introVideo.muted = false;
+        introVideo.volume = 1.0;
         introVideo.loop = false;
         introVideo.autoplay = true;
         introVideo.play().then(function () {
             updatePlayPauseButton();
+            hideSoundOverlay();
+            if (soundBtn) {
+                soundBtn.textContent = 'Mute';
+            }
         }).catch(function () {
-            if (introScreen) {
-                introScreen.classList.add('tap-to-play');
+            showSoundOverlay();
+            introScreen.classList.add('tap-to-play');
+            introVideo.muted = true;
+            if (soundBtn) {
+                soundBtn.textContent = 'Unmute';
             }
         });
     }
@@ -118,12 +137,20 @@
         skipBtn.addEventListener('click', hideIntroScreen);
     }
 
-    if (unmuteBtn) {
-        unmuteBtn.addEventListener('click', function () {
+    if (soundBtn) {
+        soundBtn.addEventListener('click', function () {
             if (!introVideo) return;
-            introVideo.muted = false;
-            introVideo.play().catch(function () {});
-            unmuteBtn.style.display = 'none';
+            if (introVideo.muted) {
+                introVideo.muted = false;
+                introVideo.volume = 1.0;
+                soundBtn.textContent = 'Mute';
+                hideSoundOverlay();
+                introVideo.currentTime = 0;
+                introVideo.play().catch(function () {});
+            } else {
+                introVideo.muted = true;
+                soundBtn.textContent = 'Unmute';
+            }
         });
     }
 
@@ -145,9 +172,29 @@
         });
     }
 
+    if (soundOverlay) {
+        soundOverlay.addEventListener('click', function () {
+            if (!introVideo) return;
+            introVideo.muted = false;
+            introVideo.volume = 1.0;
+            introVideo.currentTime = 0;
+            introVideo.play().catch(function () {});
+            hideSoundOverlay();
+            if (soundBtn) {
+                soundBtn.textContent = 'Mute';
+            }
+            introScreen.classList.remove('tap-to-play');
+        });
+    }
+
     if (introVideo) {
         introVideo.addEventListener('ended', hideIntroScreen);
-        introVideo.addEventListener('play', updatePlayPauseButton);
+        introVideo.addEventListener('play', function () {
+            updatePlayPauseButton();
+            if (soundBtn && !introVideo.muted) {
+                soundBtn.textContent = 'Mute';
+            }
+        });
         introVideo.addEventListener('pause', updatePlayPauseButton);
     }
 
@@ -164,7 +211,7 @@
 
     document.addEventListener('click', function (event) {
         if (!introScreen || !introScreen.classList.contains('is-visible')) return;
-        if (event.target.closest('.intro-play-btn') || event.target.closest('.intro-video-controls') || event.target.closest('.intro-close-btn') || event.target.closest('.intro-skip-btn')) {
+        if (event.target.closest('.intro-play-btn') || event.target.closest('.intro-video-controls') || event.target.closest('.intro-close-btn') || event.target.closest('.intro-skip-btn') || event.target.closest('.intro-sound-btn') || event.target.closest('.intro-sound-overlay')) {
             return;
         }
         if (introScreen.classList.contains('tap-to-play') && introVideo && introVideo.paused) {

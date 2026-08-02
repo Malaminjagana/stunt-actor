@@ -286,6 +286,55 @@
     pointer-events: none;
 }
 
+.intro-sound-btn {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    z-index: 4;
+    pointer-events: auto;
+    min-width: 110px;
+    border: none;
+    border-radius: 999px;
+    padding: 0.8rem 1rem;
+    color: #fff;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(12px);
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.intro-sound-btn:hover {
+    background: rgba(255, 255, 255, 0.18);
+}
+
+.intro-sound-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: auto;
+    opacity: 0;
+    background: rgba(0, 0, 0, 0.55);
+    transition: opacity 200ms ease;
+}
+
+.intro-sound-overlay.visible {
+    opacity: 1;
+}
+
+.intro-sound-message {
+    color: #fff;
+    font-size: 1.6rem;
+    font-weight: 700;
+    text-align: center;
+    padding: 1.5rem 2rem;
+    border: 2px solid rgba(255, 255, 255, 0.18);
+    background: rgba(0, 0, 0, 0.6);
+    border-radius: 1rem;
+    cursor: pointer;
+}
+
 .intro-video-controls {
     display: flex;
     gap: 0.75rem;
@@ -299,7 +348,6 @@
 
 .intro-video-screen:hover .intro-video-controls,
 .intro-video-screen:hover .intro-close-btn,
-.intro-video-screen:hover .intro-unmute-btn,
 .intro-video-screen:hover .intro-play-btn {
     opacity: 1;
     transform: translateY(0);
@@ -344,10 +392,6 @@
 .intro-play-btn:hover {
     background: rgba(255, 255, 255, 0.16);
     transform: translateY(-1px);
-}
-
-.intro-unmute-btn {
-    min-width: 110px;
 }
 
 .intro-playpause-btn {
@@ -399,7 +443,7 @@ body.intro-open {
 @media (hover: none) {
     .intro-video-controls,
     .intro-close-btn,
-    .intro-unmute-btn,
+    .intro-sound-btn,
     .intro-play-btn {
         opacity: 1;
         transform: translateY(0);

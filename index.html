@@ -41,20 +41,23 @@
         <!-- Spinner End -->
 
         <!-- Full-Screen Intro Video Start -->
-        <div class="intro-video-screen" id="intro-video-screen" aria-hidden="true" aria-modal="true" role="dialog" aria-label="Stunt fighter intro video playing">
-            <video id="introVideo" class="intro-video-element" playsinline preload="auto" muted autoplay loop="false" poster="img/fighter.jpeg" aria-label="Stunt fighter intro video playing">
+        <div class="intro-video-screen" id="intro-video-screen" aria-hidden="true" aria-modal="true" role="dialog" aria-label="Stunt fighter intro video with sound">
+            <video id="introVideo" class="intro-video-element" playsinline preload="auto" autoplay loop="false" poster="img/fighter.jpeg" aria-label="Stunt fighter intro video with sound">
                 <source src="img/ljstunt.mp4" type="video/mp4">
                 Your browser does not support the video tag.
             </video>
             <div class="intro-video-backdrop"></div>
             <div class="intro-video-ui">
+                <button class="intro-sound-btn" type="button" aria-label="Toggle sound">Unmute</button>
                 <div class="intro-video-controls">
                     <button class="intro-playpause-btn" type="button" aria-label="Pause video">Pause</button>
-                    <button class="intro-unmute-btn" type="button" aria-label="Unmute video">Unmute</button>
                 </div>
                 <button class="intro-close-btn" type="button" aria-label="Close intro video">×</button>
                 <button class="intro-skip-btn" type="button" aria-label="Skip intro">Skip Intro</button>
-                <button class="intro-play-btn" type="button" aria-label="Tap to play">Tap to Play</button>
+                <button class="intro-play-btn" type="button" aria-label="Play intro video">Play Intro</button>
+                <div class="intro-sound-overlay" id="intro-sound-overlay">
+                    <div class="intro-sound-message">Click to enable sound</div>
+                </div>
             </div>
         </div>
         <!-- Full-Screen Intro Video End -->

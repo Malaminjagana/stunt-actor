@@ -20,6 +20,7 @@
     var skipBtn = introScreen ? introScreen.querySelector('.intro-skip-btn') : null;
     var tapPlayBtn = introScreen ? introScreen.querySelector('.intro-play-btn') : null;
     var lastFocusedElement = null;
+    var introVideoSessionKey = 'introVideoHasPlayed';
 
     function isTouchDevice() {
         return ('ontouchstart' in window || navigator.maxTouchPoints > 0 || window.matchMedia('(pointer: coarse)').matches);
@@ -75,6 +76,41 @@
         soundOverlay.classList.remove('visible');
     }
 
+    function hasIntroVideoPlayedInSession() {
+        try {
+            return sessionStorage.getItem(introVideoSessionKey) === 'true';
+        } catch (error) {
+            return false;
+        }
+    }
+
+    function markIntroVideoPlayedInSession() {
+        try {
+            sessionStorage.setItem(introVideoSessionKey, 'true');
+        } catch (error) {
+            // Ignore storage errors and fall back to default behavior.
+        }
+    }
+
+    function clearIntroVideoSessionFlag() {
+        try {
+            sessionStorage.removeItem(introVideoSessionKey);
+        } catch (error) {
+            // Ignore storage errors and fall back to default behavior.
+        }
+    }
+
+    function applyIntroVideoAutoplayState() {
+        if (!introVideo) return;
+        if (hasIntroVideoPlayedInSession()) {
+            introVideo.removeAttribute('autoplay');
+            introVideo.autoplay = false;
+        } else {
+            introVideo.setAttribute('autoplay', '');
+            introVideo.autoplay = true;
+        }
+    }
+
     function startVideoAutoplay() {
         if (!introVideo) return;
         introVideo.muted = false;
@@ -105,6 +141,7 @@
         var mobileSlowPath = isTouchDevice() && slowConnection;
         var useTapToPlay = prefersReducedMotion || mobileSlowPath;
 
+        applyIntroVideoAutoplayState();
         showIntroScreen();
         lastFocusedElement = document.activeElement;
 
@@ -114,8 +151,16 @@
                 introVideo.muted = true;
                 introVideo.loop = false;
             }
-        } else {
+        } else if (!hasIntroVideoPlayedInSession()) {
             startVideoAutoplay();
+        } else {
+            introScreen.classList.remove('tap-to-play');
+            if (introVideo) {
+                introVideo.muted = true;
+                introVideo.loop = false;
+                introVideo.autoplay = false;
+                introVideo.pause();
+            }
         }
     }
 
@@ -188,8 +233,12 @@
     }
 
     if (introVideo) {
-        introVideo.addEventListener('ended', hideIntroScreen);
+        introVideo.addEventListener('ended', function () {
+            hideIntroScreen();
+        });
         introVideo.addEventListener('play', function () {
+            markIntroVideoPlayedInSession();
+            applyIntroVideoAutoplayState();
             updatePlayPauseButton();
             if (soundBtn && !introVideo.muted) {
                 soundBtn.textContent = 'Mute';
